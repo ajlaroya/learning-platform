@@ -21,7 +21,7 @@ export function SearchInput({
         placeholder={placeholder}
         className={cn(
           size === "lg"
-            ? "h-[88px] w-full rounded-xl border border-canvas-line bg-white pl-16 pr-20 text-[18px] text-neutral-900 placeholder:text-neutral-500 shadow-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-400/20"
+            ? "h-22 w-full rounded-xl border border-canvas-line bg-white pl-16 pr-20 text-[18px] text-neutral-900 placeholder:text-neutral-500 shadow-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-400/20"
             : "h-11 w-full rounded-xl border border-neutral-200 bg-white pl-11 pr-12 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20",
           className,
         )}
