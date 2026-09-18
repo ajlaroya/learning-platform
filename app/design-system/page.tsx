@@ -92,7 +92,7 @@ const sectionHeader = (number: string, title: string) => (
 export default function DesignSystemPage() {
   return (
     <div className="min-h-screen bg-[#f5f3f0] p-8 text-neutral-900">
-      <div className="mx-auto max-w-[1280px] rounded-[20px] bg-[#f8f7f4] p-8 shadow-[0_10px_30px_rgba(15,23,42,0.03)]">
+      <div className="mx-auto max-w-7xl rounded-[20px] bg-[#f8f7f4] p-8 shadow-[0_10px_30px_rgba(15,23,42,0.03)]">
         <div className="space-y-6">
           <section className="pb-8">
             <div className="mb-6 flex items-center justify-between">
@@ -104,7 +104,7 @@ export default function DesignSystemPage() {
 
             <div className="flex items-start justify-between gap-6">
               <div className="text-display-1">Design System</div>
-              <div className="max-w-[520px] text-lg leading-7 text-neutral-700">
+              <div className="max-w-130 text-lg leading-7 text-neutral-700">
                 A unified design language for Vertex learning platform. Clean,
                 modern and focused on clarity, consistency and intuitive
                 learning experiences.
