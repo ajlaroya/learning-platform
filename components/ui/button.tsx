@@ -3,7 +3,7 @@ import { ArrowUpRight, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type ButtonVariant = "primary" | "secondary" | "tertiary" | "text";
-type ButtonSize = "lg" | "md";
+type ButtonSize = "xl" | "lg" | "md";
 
 type SharedProps = {
   variant?: ButtonVariant;
@@ -19,6 +19,7 @@ const baseClass =
   "inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:cursor-not-allowed";
 
 const sizeClass: Record<ButtonSize, string> = {
+  xl: "h-16 px-7 text-[17px]",
   lg: "h-11 px-4 text-sm",
   md: "h-10 px-3 text-xs",
 };
