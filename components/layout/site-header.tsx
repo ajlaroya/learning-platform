@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Bell } from "lucide-react";
+import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { VertexLogo } from "@/components/brand/logo";
-import { Avatar } from "@/components/ui/avatar";
 
 export function SiteHeader() {
   return (
@@ -11,7 +11,7 @@ export function SiteHeader() {
           <VertexLogo />
         </Link>
         <nav
-          className="flex items-center gap-8 text-sm text-neutral-900"
+          className="hidden items-center gap-8 text-sm text-neutral-900 sm:flex"
           aria-label="Main navigation"
         >
           <Link
@@ -36,7 +36,29 @@ export function SiteHeader() {
         >
           <Bell className="h-5 w-5" />
         </button>
-        <Avatar name="Arthur Laroya" />
+        <Show when="signed-out">
+          <div className="flex items-center gap-1 text-xs font-medium sm:gap-4 sm:text-sm">
+            <SignInButton mode="modal">
+              <button
+                type="button"
+                className="rounded-lg px-2 py-2 text-neutral-700 hover:bg-primary-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 sm:px-3"
+              >
+                Sign in
+              </button>
+            </SignInButton>
+            <SignUpButton mode="modal">
+              <button
+                type="button"
+                className="rounded-lg bg-primary-500 px-3 py-2 text-white shadow-sm hover:bg-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 sm:px-4"
+              >
+                Sign up
+              </button>
+            </SignUpButton>
+          </div>
+        </Show>
+        <Show when="signed-in">
+          <UserButton />
+        </Show>
       </div>
     </header>
   );
