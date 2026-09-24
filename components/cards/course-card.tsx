@@ -31,8 +31,9 @@ export function CourseCard({
     >
       <div
         className={cn(
-          "flex items-center justify-center rounded-xl bg-neutral-900 text-xl font-bold text-white",
+          "flex items-center justify-center overflow-hidden rounded-xl",
           layout === "stacked" ? "h-18 w-18" : "h-12 w-12",
+          !mark && "bg-neutral-900 text-xl font-bold text-white",
         )}
       >
         {mark ?? "N"}

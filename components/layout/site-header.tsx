@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { Bell } from "lucide-react";
 import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { analyticsEvents, captureEvent } from "@/components/analytics/events";
 import { VertexLogo } from "@/components/brand/logo";
 
 export function SiteHeader() {
@@ -41,6 +44,11 @@ export function SiteHeader() {
             <SignInButton mode="modal">
               <button
                 type="button"
+                onClick={() =>
+                  captureEvent(analyticsEvents.signInStarted, {
+                    auth_flow: "clerk_modal",
+                  })
+                }
                 className="rounded-lg px-2 py-2 text-neutral-700 hover:bg-primary-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 sm:px-3"
               >
                 Sign in
@@ -49,6 +57,11 @@ export function SiteHeader() {
             <SignUpButton mode="modal">
               <button
                 type="button"
+                onClick={() =>
+                  captureEvent(analyticsEvents.signUpStarted, {
+                    auth_flow: "clerk_modal",
+                  })
+                }
                 className="rounded-lg bg-primary-500 px-3 py-2 text-white shadow-sm hover:bg-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 sm:px-4"
               >
                 Sign up

@@ -1,13 +1,59 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Star } from "lucide-react";
-import { CourseMark } from "@/components/brand/course-marks";
 import { ChartDecoration } from "@/components/home/chart-decoration";
 import { Hero } from "@/components/home/hero";
 import { SiteHeader } from "@/components/layout/site-header";
 import { PageFrame } from "@/components/layout/page-frame";
 import { CourseCard } from "@/components/cards/course-card";
+import { formatDuration, formatLevel } from "@/lib/format";
+import { courseHref } from "@/lib/routes";
+import { sanityFetch } from "@/sanity/lib/fetch";
+import { urlFor } from "@/sanity/lib/image";
+import { COURSES_LIST_QUERY } from "@/sanity/lib/queries";
+import type { COURSES_LIST_QUERY_RESULT } from "@/sanity.types";
 
-export default function Home() {
+type CourseCoverImageData = NonNullable<
+  COURSES_LIST_QUERY_RESULT[number]["coverImage"]
+>;
+
+function CourseCoverImage({
+  title,
+  image,
+}: {
+  title: string;
+  image: CourseCoverImageData;
+}) {
+  if (!image?.asset) {
+    return (
+      <span
+        className="flex h-14 w-14 items-center justify-center rounded-lg bg-neutral-900 text-2xl font-bold text-white"
+        aria-hidden="true"
+      >
+        {title.charAt(0).toUpperCase()}
+      </span>
+    );
+  }
+
+  return (
+    <div className="relative h-14 w-14 overflow-hidden rounded-lg bg-neutral-100">
+      <Image
+        src={urlFor(image).width(160).height(160).fit("crop").url()}
+        alt={image.alt ?? title}
+        fill
+        className="object-cover"
+        sizes="56px"
+      />
+    </div>
+  );
+}
+
+export default async function Home() {
+  const courses = await sanityFetch<COURSES_LIST_QUERY_RESULT>({
+    query: COURSES_LIST_QUERY,
+    tags: ["course", "lesson"],
+  });
+
   return (
     <PageFrame>
       <SiteHeader />
@@ -26,33 +72,33 @@ export default function Home() {
             </Link>
           </div>
           <div className="mt-5 grid gap-4 md:grid-cols-3">
-            <CourseCard
-              layout="stacked"
-              mark={<CourseMark type="next" />}
-              title="Next.js for Production"
-              description="Build scalable, high-performance web applications with Next.js."
-              level="Intermediate"
-              duration="18h 24m"
-              modules="12 modules"
-            />
-            <CourseCard
-              layout="stacked"
-              mark={<CourseMark type="docker" />}
-              title="Docker Essentials"
-              description="Containerize applications and streamline your development workflow."
-              level="Beginner"
-              duration="10h 12m"
-              modules="8 modules"
-            />
-            <CourseCard
-              layout="stacked"
-              mark={<CourseMark type="typescript" />}
-              title="TypeScript Deep Dive"
-              description="Go beyond the basics and write safer, more expressive code."
-              level="Intermediate"
-              duration="14h 36m"
-              modules="10 modules"
-            />
+            {courses.slice(0, 3).map((course) => (
+              <Link
+                key={course._id}
+                href={courseHref(course.slug)}
+                className="rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                <CourseCard
+                  layout="stacked"
+                  mark={
+                    <CourseCoverImage
+                      title={course.title}
+                      image={course.coverImage}
+                    />
+                  }
+                  title={course.title}
+                  description={course.summary}
+                  level={formatLevel(course.level)}
+                  duration={formatDuration(course.totalDuration)}
+                  modules={`${course.moduleCount} modules`}
+                />
+              </Link>
+            ))}
+            {courses.length === 0 && (
+              <p className="col-span-full rounded-xl border border-canvas-line p-6 text-sm text-neutral-500">
+                Courses are being updated. Check back soon.
+              </p>
+            )}
           </div>
         </section>
         <section className="relative flex min-h-62.5 items-start justify-center overflow-hidden border-t border-canvas-line pt-10">
