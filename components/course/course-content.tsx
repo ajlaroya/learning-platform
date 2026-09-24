@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
+import { analyticsEvents, captureEvent } from "@/components/analytics/events";
 import { Badge } from "@/components/ui/badge";
 import { formatDuration, lessonLabel } from "@/lib/format";
 import { lessonHref } from "@/lib/routes";
@@ -50,7 +51,16 @@ export function CourseContent({ course }: { course: Course }) {
                 type="button"
                 aria-expanded={isOpen}
                 aria-controls={`module-${module._key}`}
-                onClick={() => setOpenModule(isOpen ? null : moduleIndex)}
+                onClick={() => {
+                  setOpenModule(isOpen ? null : moduleIndex);
+                  captureEvent(analyticsEvents.courseModuleToggled, {
+                    course_id: course._id,
+                    course_slug: course.slug,
+                    module_key: module._key,
+                    module_index: moduleIndex,
+                    module_state: isOpen ? "collapsed" : "expanded",
+                  });
+                }}
                 className="flex min-h-16 w-full items-center gap-4 px-4 py-3 text-left transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500 sm:px-6"
               >
                 <span
@@ -86,6 +96,17 @@ export function CourseContent({ course }: { course: Course }) {
                     <Link
                       key={lesson._id}
                       href={lessonHref(lesson.slug)}
+                      onClick={() =>
+                        captureEvent(analyticsEvents.courseLessonSelected, {
+                          course_id: course._id,
+                          course_slug: course.slug,
+                          module_key: module._key,
+                          module_index: moduleIndex,
+                          lesson_id: lesson._id,
+                          lesson_slug: lesson.slug,
+                          free_preview: lesson.freePreview,
+                        })
+                      }
                       className="flex items-center gap-3 border-b border-canvas-line py-3 text-sm last:border-b-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                     >
                       <span className="w-8 shrink-0 text-xs text-neutral-400">

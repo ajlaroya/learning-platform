@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BarChart3, Bookmark, Clock3, Users } from "lucide-react";
+import { analyticsEvents, captureEvent } from "@/components/analytics/events";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { urlFor } from "@/sanity/lib/image";
@@ -74,12 +77,26 @@ export function CourseHero({ course }: { course: Course }) {
               href={lessonHref(firstLesson.slug)}
               variant="primary"
               size="xl"
+              onClick={() =>
+                captureEvent(analyticsEvents.courseContinueClicked, {
+                  course_id: course._id,
+                  course_slug: course.slug,
+                  lesson_id: firstLesson._id,
+                  lesson_slug: firstLesson.slug,
+                })
+              }
             >
               Continue Learning <ArrowRight className="h-4 w-4" />
             </ButtonLink>
           )}
           <Link
             href="#course-content"
+            onClick={() =>
+              captureEvent(analyticsEvents.courseBookmarkClicked, {
+                course_id: course._id,
+                course_slug: course.slug,
+              })
+            }
             className="inline-flex h-16 items-center justify-center gap-2 rounded-xl border border-neutral-200 px-6 text-[17px] font-medium text-neutral-900 transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
           >
             <Bookmark className="h-4 w-4" /> Bookmark

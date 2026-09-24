@@ -1,4 +1,7 @@
+"use client";
+
 import { ArrowRight } from "lucide-react";
+import { analyticsEvents, captureEvent } from "@/components/analytics/events";
 import { ButtonLink } from "@/components/ui/button";
 import { SearchInput } from "@/components/ui/search-input";
 
@@ -22,6 +25,11 @@ export function Hero() {
         href="/courses"
         size="xl"
         className="mt-8 gap-5 bg-primary-500 shadow-md"
+        onClick={() =>
+          captureEvent(analyticsEvents.coursesExploreClicked, {
+            cta_location: "home_hero",
+          })
+        }
       >
         Explore Courses <ArrowRight className="h-5 w-5" />
       </ButtonLink>
