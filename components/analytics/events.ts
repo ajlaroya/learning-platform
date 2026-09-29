@@ -14,6 +14,7 @@ export const analyticsEvents = {
   videoPlayed: "video_played",
   lessonTabChanged: "lesson_tab_changed",
   lessonResourceClicked: "lesson_resource_clicked",
+  searchPerformed: "search_performed",
 } as const;
 
 type EventProperties = Record<

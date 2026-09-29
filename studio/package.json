@@ -5,7 +5,8 @@
     "dev": "sanity dev",
     "build": "sanity build",
     "deploy": "sanity deploy",
-    "typegen": "sanity schemas extract --enforce-required-fields --path schema.json && sanity typegen generate"
+    "typegen": "sanity schemas extract --enforce-required-fields --path schema.json && sanity typegen generate",
+    "context:import": "node scripts/context/import-context.mjs"
   },
   "dependencies": {
     "@sanity/icons": "^3.8.0",
