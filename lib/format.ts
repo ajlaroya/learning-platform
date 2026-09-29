@@ -18,3 +18,12 @@ export function formatLevel(level: "advanced" | "beginner" | "intermediate") {
 export function lessonLabel(moduleIndex: number, lessonIndex: number) {
   return `${moduleIndex + 1}.${lessonIndex + 1}`;
 }
+
+export function formatTimestamp(seconds: number) {
+  const totalSeconds = Math.max(0, Math.floor(seconds));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const remainingSeconds = totalSeconds % 60;
+  const clock = `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
+  return hours > 0 ? `${hours}:${clock}` : clock;
+}

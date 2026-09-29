@@ -84,10 +84,13 @@ export const LESSON_BY_SLUG_QUERY = defineQuery(/* groq */ `
       _id,
       title,
       "slug": slug.current,
+      level,
+      coverImage ${imageProjection},
       instructor->{name, "slug": slug.current, photo ${imageProjection}},
       modules[]{
         _key,
         title,
+        "durationSeconds": math::sum(lessons[]->duration),
         lessons[]->{_id, title, "slug": slug.current, duration, freePreview}
       }
     }
