@@ -1,15 +1,20 @@
+import type { InputHTMLAttributes } from "react";
 import { Search, Command } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+type SearchInputProps = Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  "size" | "type"
+> & {
+  size?: "md" | "lg";
+};
 
 export function SearchInput({
   className,
   placeholder = "Search anything...",
   size = "md",
-}: {
-  className?: string;
-  placeholder?: string;
-  size?: "md" | "lg";
-}) {
+  ...inputProps
+}: SearchInputProps) {
   return (
     <label className="relative block">
       <span className="sr-only">Search</span>
@@ -19,6 +24,7 @@ export function SearchInput({
       <input
         type="search"
         placeholder={placeholder}
+        {...inputProps}
         className={cn(
           size === "lg"
             ? "h-22 w-full rounded-xl border border-canvas-line bg-white pl-16 pr-20 text-[18px] text-neutral-900 placeholder:text-neutral-500 shadow-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-400/20"

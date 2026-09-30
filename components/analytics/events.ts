@@ -10,6 +10,11 @@ export const analyticsEvents = {
   courseBookmarkClicked: "course_bookmark_clicked",
   courseModuleToggled: "course_module_toggled",
   courseLessonSelected: "course_lesson_selected",
+  lessonViewed: "lesson_viewed",
+  videoPlayed: "video_played",
+  lessonTabChanged: "lesson_tab_changed",
+  lessonResourceClicked: "lesson_resource_clicked",
+  searchPerformed: "search_performed",
 } as const;
 
 type EventProperties = Record<

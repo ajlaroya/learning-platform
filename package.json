@@ -10,12 +10,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ai-sdk/mcp": "^2.0.62",
+    "@ai-sdk/openai": "^4.0.80",
     "@clerk/nextjs": "^7.9.4",
     "@opentelemetry/api-logs": "^0.222.0",
     "@opentelemetry/exporter-logs-otlp-http": "^0.222.0",
     "@opentelemetry/resources": "^2.11.0",
     "@opentelemetry/sdk-logs": "^0.222.0",
+    "@portabletext/react": "^8.0.1",
     "@sanity/image-url": "^2.1.1",
+    "ai": "^7.0.122",
     "clsx": "^2.1.1",
     "lucide-react": "^1.46.0",
     "next": "16.3.4",
@@ -24,7 +28,8 @@
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "server-only": "^0.0.1",
-    "tailwind-merge": "^3.7.0"
+    "tailwind-merge": "^3.7.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

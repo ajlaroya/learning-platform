@@ -3,7 +3,7 @@
 import { ArrowRight } from "lucide-react";
 import { analyticsEvents, captureEvent } from "@/components/analytics/events";
 import { ButtonLink } from "@/components/ui/button";
-import { SearchInput } from "@/components/ui/search-input";
+import { SearchForm } from "@/components/search/search-form";
 
 export function Hero() {
   return (
@@ -34,10 +34,7 @@ export function Hero() {
         Explore Courses <ArrowRight className="h-5 w-5" />
       </ButtonLink>
       <div className="mt-8 w-full max-w-187.5">
-        <SearchInput
-          size="lg"
-          placeholder="Ask anything about your learning..."
-        />
+        <SearchForm size="lg" />
       </div>
     </section>
   );

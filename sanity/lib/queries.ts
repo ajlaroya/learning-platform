@@ -84,13 +84,55 @@ export const LESSON_BY_SLUG_QUERY = defineQuery(/* groq */ `
       _id,
       title,
       "slug": slug.current,
+      level,
+      coverImage ${imageProjection},
       instructor->{name, "slug": slug.current, photo ${imageProjection}},
       modules[]{
         _key,
         title,
+        "durationSeconds": math::sum(lessons[]->duration),
         lessons[]->{_id, title, "slug": slug.current, duration, freePreview}
       }
     }
+  }
+`);
+
+export const LESSONS_BY_IDS_QUERY = defineQuery(/* groq */ `
+  *[_type == "lesson" && _id in $ids] {
+    _id,
+    _createdAt,
+    title,
+    "slug": slug.current,
+    videoUrl,
+    duration,
+    keyPoints,
+    "notesText": pt::text(notes),
+    "thumbnailRef": thumbnail.asset._ref,
+    "course": *[_type == "course" && references(^._id)][0] {
+      _id,
+      title,
+      "slug": slug.current,
+      summary,
+      "coverImageRef": coverImage.asset._ref,
+      modules[] {
+        title,
+        lessons[]->{_id}
+      }
+    }
+  }
+`);
+
+export const VIDEO_CHAPTER_MATCHES_QUERY = defineQuery(/* groq */ `
+  *[_type == "video" && url in $urls] {
+    url,
+    "matchingChapters": chapters[label match $patterns]{startSeconds, label}
+  }
+`);
+
+export const VIDEO_CHUNK_MATCHES_QUERY = defineQuery(/* groq */ `
+  *[_type == "video" && url in $urls] {
+    url,
+    "matchingChunks": chunks[text match $patterns][0..2]{startSeconds, text}
   }
 `);
 
