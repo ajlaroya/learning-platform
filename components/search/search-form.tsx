@@ -12,7 +12,12 @@ export function SearchForm({
   className?: string;
 }) {
   return (
-    <form action="/search" method="get" className={className} role="search">
+    <form
+      action="/search"
+      method="get"
+      className={`ph-no-capture ${className ?? ""}`}
+      role="search"
+    >
       <SearchInput
         name="q"
         defaultValue={initialQuery}

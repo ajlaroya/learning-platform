@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ChartDecoration } from "@/components/home/chart-decoration";
+import { ViewTracker } from "@/components/analytics/view-tracker";
 import { CourseCard } from "@/components/cards/course-card";
 import { PageFrame } from "@/components/layout/page-frame";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -62,6 +63,10 @@ export default async function CoursesPage() {
   return (
     <PageFrame>
       <SiteHeader />
+      <ViewTracker
+        event="catalog_viewed"
+        properties={{ course_count: courses.length }}
+      />
       <main className="relative overflow-hidden px-5 pb-10 pt-7 sm:px-10 sm:pt-9">
         <div className="relative z-10 space-y-8">
           <Breadcrumbs items={[{ label: "All Courses", current: true }]} />

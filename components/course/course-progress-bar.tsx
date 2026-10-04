@@ -1,7 +1,16 @@
+"use client";
+
 import { ArrowRight } from "lucide-react";
+import { analyticsEvents, captureEvent } from "@/components/analytics/events";
 import { ButtonLink } from "@/components/ui/button";
 
-export function CourseProgressBar({ resumeHref }: { resumeHref: string }) {
+export function CourseProgressBar({
+  resumeHref,
+  courseSlug,
+}: {
+  resumeHref: string;
+  courseSlug: string;
+}) {
   return (
     <aside className="sticky bottom-4 z-20 flex flex-col gap-4 rounded-2xl border border-canvas-line bg-canvas/95 p-5 shadow-lg backdrop-blur sm:flex-row sm:items-center sm:justify-between sm:p-6">
       <div className="shrink-0">
@@ -18,6 +27,12 @@ export function CourseProgressBar({ resumeHref }: { resumeHref: string }) {
         variant="primary"
         size="xl"
         className="h-14 shrink-0 px-6 text-base"
+        onClick={() =>
+          captureEvent(analyticsEvents.courseContinueClicked, {
+            course_slug: courseSlug,
+            location: "progress_bar",
+          })
+        }
       >
         Continue Learning <ArrowRight className="h-4 w-4" />
       </ButtonLink>

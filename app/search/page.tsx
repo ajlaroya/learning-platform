@@ -33,7 +33,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <h1 className="mt-5 font-display text-[32px] font-bold leading-tight text-neutral-900 sm:text-[42px]">
             {query ? (
               <>
-                Results for <span className="text-primary-500">“{query}”</span>
+                Results for{" "}
+                <span className="ph-mask text-primary-500">“{query}”</span>
               </>
             ) : (
               "Search your learning"

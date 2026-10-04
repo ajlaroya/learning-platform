@@ -20,9 +20,12 @@ export function LessonTabs({
   const [activeTab, setActiveTab] =
     useState<(typeof tabs)[number]["id"]>("content");
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const viewedLessonId = useRef<string | null>(null);
   const activeIndex = tabs.findIndex((tab) => tab.id === activeTab);
 
   useEffect(() => {
+    if (viewedLessonId.current === lessonId) return;
+    viewedLessonId.current = lessonId;
     captureEvent(analyticsEvents.lessonViewed, {
       lesson_id: lessonId,
       lesson_slug: lessonSlug,

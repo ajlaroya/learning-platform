@@ -52,6 +52,18 @@ export type BlockContent = Array<
     }
 >;
 
+export type VideoChunk = {
+  _type: "videoChunk";
+  startSeconds: number;
+  text: string;
+};
+
+export type VideoChapter = {
+  _type: "videoChapter";
+  startSeconds: number;
+  label: string;
+};
+
 export type Resource = {
   _type: "resource";
   type: "pdf" | "link" | "repo" | "code" | "slides";
@@ -83,6 +95,28 @@ export type Module = {
       _key: string;
     } & LessonReference
   >;
+};
+
+export type Video = {
+  _id: string;
+  _type: "video";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  videoId: string;
+  url: string;
+  provider: "youtube" | "vimeo" | "bunny";
+  chapters: Array<
+    {
+      _key: string;
+    } & VideoChapter
+  >;
+  chunks: Array<
+    {
+      _key: string;
+    } & VideoChunk
+  >;
+  ingestedAt: string;
 };
 
 export type Lesson = {
@@ -317,10 +351,13 @@ export type Geopoint = {
 export type AllSanitySchemaTypes =
   | SanityImageAssetReference
   | BlockContent
+  | VideoChunk
+  | VideoChapter
   | Resource
   | LearningOutcome
   | LessonReference
   | Module
+  | Video
   | Lesson
   | SanityImageCrop
   | SanityImageHotspot
@@ -540,12 +577,24 @@ export type LESSONS_BY_IDS_QUERY_RESULT = Array<{
 // Source: ../sanity/lib/queries.ts
 // Variable: VIDEO_CHAPTER_MATCHES_QUERY
 // Query: *[_type == "video" && url in $urls] {    url,    "matchingChapters": chapters[label match $patterns]{startSeconds, label}  }
-export type VIDEO_CHAPTER_MATCHES_QUERY_RESULT = Array<never>;
+export type VIDEO_CHAPTER_MATCHES_QUERY_RESULT = Array<{
+  url: string;
+  matchingChapters: Array<{
+    startSeconds: number;
+    label: string;
+  }>;
+}>;
 
 // Source: ../sanity/lib/queries.ts
 // Variable: VIDEO_CHUNK_MATCHES_QUERY
 // Query: *[_type == "video" && url in $urls] {    url,    "matchingChunks": chunks[text match $patterns][0..2]{startSeconds, text}  }
-export type VIDEO_CHUNK_MATCHES_QUERY_RESULT = Array<never>;
+export type VIDEO_CHUNK_MATCHES_QUERY_RESULT = Array<{
+  url: string;
+  matchingChunks: Array<{
+    startSeconds: number;
+    text: string;
+  }>;
+}>;
 
 // Source: ../sanity/lib/queries.ts
 // Variable: INSTRUCTORS_LIST_QUERY

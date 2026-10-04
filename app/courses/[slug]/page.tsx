@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ChartDecoration } from "@/components/home/chart-decoration";
+import { ViewTracker } from "@/components/analytics/view-tracker";
 import { Breadcrumbs } from "@/components/nav/breadcrumbs";
 import { CourseContent } from "@/components/course/course-content";
 import { CourseHero } from "@/components/course/course-hero";
@@ -48,10 +49,23 @@ export default async function CoursePage({ params }: CourseParams) {
   const course = await getCourse(slug);
   if (!course) notFound();
   const firstLesson = course.modules[0]?.lessons[0];
+  const lessonCount = course.modules.reduce(
+    (total, module) => total + module.lessons.length,
+    0,
+  );
 
   return (
     <PageFrame>
       <SiteHeader />
+      <ViewTracker
+        event="course_viewed"
+        properties={{
+          course_slug: course.slug,
+          module_count: course.modules.length,
+          lesson_count: lessonCount,
+          level: course.level,
+        }}
+      />
       <main className="relative overflow-hidden px-5 pb-8 pt-7 sm:px-10 sm:pt-9">
         <div className="relative z-10 space-y-10 sm:space-y-12">
           <Breadcrumbs
@@ -64,7 +78,10 @@ export default async function CoursePage({ params }: CourseParams) {
           <LearningOutcomes outcomes={course.learningOutcomes} />
           <CourseContent course={course} />
           {firstLesson && (
-            <CourseProgressBar resumeHref={lessonHref(firstLesson.slug)} />
+            <CourseProgressBar
+              courseSlug={course.slug}
+              resumeHref={lessonHref(firstLesson.slug)}
+            />
           )}
         </div>
         <ChartDecoration />

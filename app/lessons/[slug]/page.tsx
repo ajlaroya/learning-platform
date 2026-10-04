@@ -169,7 +169,9 @@ export default async function LessonPage({
           />
           <div className="mt-5">
             <LessonVideo
+              key={lesson.slug}
               lesson={lesson}
+              courseSlug={course?.slug ?? null}
               startSeconds={start.seconds}
               thumbnailUrl={thumbnailUrl}
               shouldAutoplay={start.autoplay}
@@ -192,7 +194,11 @@ export default async function LessonPage({
             </LessonTabs>
           </div>
         </div>
-        <LessonFooterNav previous={previous} next={next} />
+        <LessonFooterNav
+          currentLessonSlug={lesson.slug}
+          previous={previous}
+          next={next}
+        />
       </main>
     </PageFrame>
   );

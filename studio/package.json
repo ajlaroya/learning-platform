@@ -6,7 +6,11 @@
     "build": "sanity build",
     "deploy": "sanity deploy",
     "typegen": "sanity schemas extract --enforce-required-fields --path schema.json && sanity typegen generate",
-    "context:import": "node scripts/context/import-context.mjs"
+    "context:import": "node scripts/context/import-context.mjs",
+    "ingest:videos": "node scripts/ingest/ingest-videos.mjs",
+    "ingest:build": "node scripts/ingest/build-ndjson.mjs",
+    "ingest:import": "node scripts/ingest/import-videos.mjs",
+    "test:ingest": "node --test scripts/ingest/ingest.test.mjs"
   },
   "dependencies": {
     "@sanity/icons": "^3.8.0",

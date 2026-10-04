@@ -16,4 +16,8 @@ export const structure: StructureResolver = (S) =>
       S.listItem()
         .title("Categories")
         .child(S.documentTypeList("category").title("Categories")),
+      S.divider(),
+      S.listItem()
+        .title("Video index")
+        .child(S.documentTypeList("video").title("Video index")),
     ]);

@@ -38,6 +38,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# generated video ingestion data
+/studio/scripts/ingest/.cache/
+/studio/scripts/ingest/videos.ndjson
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

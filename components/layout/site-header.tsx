@@ -70,7 +70,9 @@ export function SiteHeader() {
           </div>
         </Show>
         <Show when="signed-in">
-          <UserButton />
+          <span className="ph-no-capture">
+            <UserButton />
+          </span>
         </Show>
       </div>
     </header>

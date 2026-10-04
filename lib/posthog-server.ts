@@ -1,0 +1,63 @@
+import "server-only";
+import { PostHog } from "posthog-node";
+
+let client: PostHog | null = null;
+
+export function getPostHogClient() {
+  const projectToken = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
+  const host = process.env.NEXT_PUBLIC_POSTHOG_HOST;
+
+  if (!projectToken || !host) {
+    if (process.env.NODE_ENV === "development") {
+      const variableName = !projectToken
+        ? "NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN"
+        : "NEXT_PUBLIC_POSTHOG_HOST";
+      throw new Error(
+        `${variableName} variable required by PostHog is missing or un-configured, this causes events to be silently missed. This error stops appearing once ${variableName} is configured`,
+      );
+    }
+
+    return null;
+  }
+
+  if (!client) {
+    client = new PostHog(projectToken, {
+      host,
+      flushAt: 1,
+      flushInterval: 0,
+      enableExceptionAutocapture: true,
+    });
+  }
+
+  return client;
+}
+
+export async function captureServerEvent({
+  event,
+  distinctId,
+  sessionId,
+  properties,
+}: {
+  event: string;
+  distinctId: string | null;
+  sessionId?: string;
+  properties: Record<string, string | number | boolean | null>;
+}) {
+  const posthog = getPostHogClient();
+  if (!posthog || !distinctId) return;
+
+  try {
+    posthog.capture({
+      distinctId,
+      event,
+      disableGeoip: true,
+      properties: {
+        ...properties,
+        ...(sessionId ? { $session_id: sessionId } : {}),
+      },
+    });
+    await posthog.flush();
+  } catch {
+    console.error("PostHog event delivery failed");
+  }
+}

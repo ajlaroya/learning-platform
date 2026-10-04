@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { analyticsEvents, captureEvent } from "@/components/analytics/events";
 import { formatDuration } from "@/lib/format";
 import { lessonHref } from "@/lib/routes";
 import type { LESSON_BY_SLUG_QUERY_RESULT } from "@/sanity.types";
@@ -9,9 +12,11 @@ type Course = NonNullable<Lesson["course"]>;
 type CurriculumLesson = Course["modules"][number]["lessons"][number];
 
 export function LessonFooterNav({
+  currentLessonSlug,
   previous,
   next,
 }: {
+  currentLessonSlug: string;
   previous: CurriculumLesson | null;
   next: CurriculumLesson | null;
 }) {
@@ -24,6 +29,13 @@ export function LessonFooterNav({
           <div className="flex min-w-0 items-center gap-4">
             <Link
               href={lessonHref(previous.slug)}
+              onClick={() =>
+                captureEvent(analyticsEvents.lessonNavigated, {
+                  from_lesson_slug: currentLessonSlug,
+                  to_lesson_slug: previous.slug,
+                  direction: "previous",
+                })
+              }
               className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg border border-canvas-line px-3 text-xs font-medium text-neutral-900 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Previous
@@ -53,6 +65,13 @@ export function LessonFooterNav({
             </span>
             <Link
               href={lessonHref(next.slug)}
+              onClick={() =>
+                captureEvent(analyticsEvents.lessonNavigated, {
+                  from_lesson_slug: currentLessonSlug,
+                  to_lesson_slug: next.slug,
+                  direction: "next",
+                })
+              }
               className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg bg-primary-500 px-4 text-xs font-semibold text-white hover:bg-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
             >
               Next Lesson <ArrowRight className="h-4 w-4" aria-hidden="true" />

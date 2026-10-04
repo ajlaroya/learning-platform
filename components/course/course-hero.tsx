@@ -83,6 +83,7 @@ export function CourseHero({ course }: { course: Course }) {
                   course_slug: course.slug,
                   lesson_id: firstLesson._id,
                   lesson_slug: firstLesson.slug,
+                  location: "hero",
                 })
               }
             >

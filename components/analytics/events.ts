@@ -1,26 +1,17 @@
 "use client";
 
 import posthog from "posthog-js";
+import { analyticsEvents } from "@/lib/analytics/events";
 
-export const analyticsEvents = {
-  coursesExploreClicked: "courses_explore_clicked",
-  signInStarted: "sign_in_started",
-  signUpStarted: "sign_up_started",
-  courseContinueClicked: "course_continue_clicked",
-  courseBookmarkClicked: "course_bookmark_clicked",
-  courseModuleToggled: "course_module_toggled",
-  courseLessonSelected: "course_lesson_selected",
-  lessonViewed: "lesson_viewed",
-  videoPlayed: "video_played",
-  lessonTabChanged: "lesson_tab_changed",
-  lessonResourceClicked: "lesson_resource_clicked",
-  searchPerformed: "search_performed",
-} as const;
+export { analyticsEvents } from "@/lib/analytics/events";
 
 type EventProperties = Record<
   string,
   string | number | boolean | null | undefined
 >;
+
+const uuidPattern =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export function captureEvent(
   event: (typeof analyticsEvents)[keyof typeof analyticsEvents],
@@ -28,4 +19,16 @@ export function captureEvent(
 ) {
   if (!process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN) return;
   posthog.capture(event, properties);
+}
+
+export function getPostHogContext() {
+  if (!process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN) return {};
+
+  const distinctId = posthog.get_distinct_id();
+  const sessionId = posthog.get_session_id();
+
+  return {
+    distinctId: uuidPattern.test(distinctId) ? distinctId : undefined,
+    sessionId: uuidPattern.test(sessionId) ? sessionId : undefined,
+  };
 }

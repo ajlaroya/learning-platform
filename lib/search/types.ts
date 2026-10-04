@@ -6,6 +6,8 @@ export const SORTS = ["relevance", "newest", "duration"] as const;
 export const SearchRequestSchema = z.object({
   query: z.string().trim().min(1).max(MAX_QUERY_LENGTH),
   sort: z.enum(SORTS).default("relevance"),
+  distinctId: z.string().uuid().optional(),
+  sessionId: z.string().uuid().optional(),
 });
 
 export const ModelHitSchema = z

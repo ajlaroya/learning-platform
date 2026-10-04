@@ -13,7 +13,11 @@ import {
   Play,
   SearchX,
 } from "lucide-react";
-import { analyticsEvents, captureEvent } from "@/components/analytics/events";
+import {
+  analyticsEvents,
+  captureEvent,
+  getPostHogContext,
+} from "@/components/analytics/events";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatTimestamp } from "@/lib/format";
@@ -35,6 +39,35 @@ type LoadState =
   | { status: "loading" }
   | { status: "error" }
   | { status: "success"; response: SearchResponse };
+
+const pendingSearches = new Map<string, Promise<SearchResponse>>();
+
+function loadSearchResponse(
+  requestKey: string,
+  query: string,
+  sort: SearchSort,
+) {
+  const pending = pendingSearches.get(requestKey);
+  if (pending) return pending;
+
+  const request = fetch("/api/search", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query, sort, ...getPostHogContext() }),
+  }).then(async (response) => {
+    if (!response.ok) throw new Error("Search request failed");
+    const parsed = SearchResponseSchema.safeParse(await response.json());
+    if (!parsed.success) throw new Error("Invalid search response");
+    return parsed.data;
+  });
+
+  pendingSearches.set(requestKey, request);
+  void request.then(
+    () => pendingSearches.delete(requestKey),
+    () => pendingSearches.delete(requestKey),
+  );
+  return request;
+}
 
 function CourseMark({ result }: { result: SearchResult }) {
   if (!result.courseIconUrl) {
@@ -74,12 +107,15 @@ function CourseHeading({ result }: { result: SearchResult }) {
 
 function VideoResultCard({
   result,
+  onOpen,
 }: {
   result: Extract<SearchResult, { kind: "video" }>;
+  onOpen: () => void;
 }) {
   return (
     <Link
       href={result.href}
+      onClick={onOpen}
       className="block overflow-hidden rounded-xl border border-canvas-line bg-white transition-colors hover:border-primary-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
     >
       <article className="grid md:grid-cols-[276px_minmax(0,1fr)]">
@@ -132,12 +168,15 @@ function VideoResultCard({
 
 function LessonResultCard({
   result,
+  onOpen,
 }: {
   result: Extract<SearchResult, { kind: "lesson" }>;
+  onOpen: () => void;
 }) {
   return (
     <Link
       href={result.href}
+      onClick={onOpen}
       className="block overflow-hidden rounded-xl border border-canvas-line bg-white transition-colors hover:border-primary-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
     >
       <article className="grid md:grid-cols-[276px_minmax(0,1fr)]">
@@ -258,40 +297,29 @@ export function SearchResults() {
   useEffect(() => {
     if (!query) return;
 
-    const controller = new AbortController();
+    let active = true;
 
     async function loadResults() {
       try {
-        const response = await fetch("/api/search", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query, sort }),
-          signal: controller.signal,
-        });
-        if (!response.ok) throw new Error("Search request failed");
+        const response = await loadSearchResponse(requestKey, query, sort);
 
-        const parsed = SearchResponseSchema.safeParse(await response.json());
-        if (!parsed.success) throw new Error("Invalid search response");
+        if (!active) return;
 
-        captureEvent(analyticsEvents.searchPerformed, {
-          query,
-          result_count: parsed.data.count,
-          course_count: parsed.data.courseCount,
-          sort,
-        });
         setRequestState({
           key: requestKey,
-          state: { status: "success", response: parsed.data },
+          state: { status: "success", response },
         });
       } catch {
-        if (!controller.signal.aborted) {
+        if (active) {
           setRequestState({ key: requestKey, state: { status: "error" } });
         }
       }
     }
 
     void loadResults();
-    return () => controller.abort();
+    return () => {
+      active = false;
+    };
   }, [query, requestKey, sort]);
 
   if (!query) return null;
@@ -323,6 +351,11 @@ export function SearchResults() {
   const queryParams = new URLSearchParams(searchParams.toString());
 
   function changeSort(nextSort: SearchSort) {
+    captureEvent(analyticsEvents.searchSortChanged, {
+      previous_sort: sort,
+      sort: nextSort,
+      result_count: response.count,
+    });
     queryParams.set("q", query);
     if (nextSort === "relevance") queryParams.delete("sort");
     else queryParams.set("sort", nextSort);
@@ -362,20 +395,34 @@ export function SearchResults() {
         <SearchEmptyState />
       ) : (
         <div className="space-y-4">
-          {response.results.map((result) =>
-            result.kind === "video" ? (
+          {response.results.map((result, index) => {
+            const onOpen = () =>
+              captureEvent(analyticsEvents.searchResultOpened, {
+                sort,
+                result_kind: result.kind,
+                rank: index + 1,
+                result_count: response.count,
+                course_slug: result.courseSlug,
+                lesson_slug: result.lessonSlug,
+                ...(result.kind === "video"
+                  ? { start_seconds: result.startSeconds }
+                  : {}),
+              });
+
+            return result.kind === "video" ? (
               <VideoResultCard
                 key={`${result.lessonId}-video-${result.startSeconds}`}
                 result={result}
+                onOpen={onOpen}
               />
             ) : (
               <LessonResultCard
                 key={`${result.lessonId}-lesson`}
                 result={result}
+                onOpen={onOpen}
               />
-            ),
-          )}
-          <SearchEmptyState />
+            );
+          })}
         </div>
       )}
     </div>

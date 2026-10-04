@@ -5,17 +5,20 @@ import { useEffect, useRef, useState } from "react";
 import { Play } from "lucide-react";
 import { analyticsEvents, captureEvent } from "@/components/analytics/events";
 import { parseVideoUrl } from "@/lib/video";
+import { useWatchDepth } from "@/components/lesson/use-watch-depth";
 import type { LESSON_BY_SLUG_QUERY_RESULT } from "@/sanity.types";
 
 type Lesson = NonNullable<LESSON_BY_SLUG_QUERY_RESULT>;
 
 export function LessonVideo({
   lesson,
+  courseSlug,
   startSeconds,
   thumbnailUrl,
   shouldAutoplay,
 }: {
   lesson: Lesson;
+  courseSlug: string | null;
   startSeconds: number;
   thumbnailUrl: string | null;
   shouldAutoplay: boolean;
@@ -26,24 +29,54 @@ export function LessonVideo({
   );
   const trackedAutoplay = useRef(false);
 
+  useWatchDepth({
+    active: playing && parsedVideo !== null,
+    lessonSlug: lesson.slug,
+    courseSlug,
+    provider: parsedVideo?.provider ?? null,
+    durationSeconds: lesson.duration,
+    startSeconds,
+  });
+
   useEffect(() => {
     if (shouldAutoplay && parsedVideo && !trackedAutoplay.current) {
       captureEvent(analyticsEvents.videoPlayed, {
-        lesson_id: lesson._id,
         lesson_slug: lesson.slug,
+        course_slug: courseSlug,
+        provider: parsedVideo.provider,
+        duration_seconds: lesson.duration,
         start_seconds: startSeconds,
+        source: "deep_link",
       });
+      if (startSeconds > 0) {
+        captureEvent(analyticsEvents.lessonResumed, {
+          lesson_slug: lesson.slug,
+          course_slug: courseSlug,
+          start_seconds: startSeconds,
+          source: "deep_link",
+        });
+      }
       trackedAutoplay.current = true;
     }
-  }, [lesson._id, lesson.slug, parsedVideo, shouldAutoplay, startSeconds]);
+  }, [
+    courseSlug,
+    lesson.duration,
+    lesson.slug,
+    parsedVideo,
+    shouldAutoplay,
+    startSeconds,
+  ]);
 
   function startPlayback() {
     if (!parsedVideo) return;
     setPlaying(true);
     captureEvent(analyticsEvents.videoPlayed, {
-      lesson_id: lesson._id,
       lesson_slug: lesson.slug,
+      course_slug: courseSlug,
+      provider: parsedVideo.provider,
+      duration_seconds: lesson.duration,
       start_seconds: startSeconds,
+      source: "poster_click",
     });
   }
 
